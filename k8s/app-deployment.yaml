@@ -24,7 +24,7 @@ spec:
             - name: DB_PORT
               value: "5432"
             - name: DB_DATABASE
-              value: auth-db
+              value: stock-db
             - name: DB_USERNAME
               value: postgres
             - name: DB_PASSWORD
