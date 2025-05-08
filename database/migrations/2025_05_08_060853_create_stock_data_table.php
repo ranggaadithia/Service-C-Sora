@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('stock_data', function (Blueprint $table) {
             $table->id();
+            $table->string('ticker');
+            $table->date('date');
+            $table->float('open');
+            $table->float('high');
+            $table->float('low');
+            $table->float('close');
+            $table->bigInteger('volume');
             $table->timestamps();
         });
     }
