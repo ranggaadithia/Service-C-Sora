@@ -20,7 +20,7 @@ spec:
             - containerPort: 8002
           env:
             - name: DB_HOST
-              value: service-a-db
+              value: service-c-db
             - name: DB_PORT
               value: "5432"
             - name: DB_DATABASE
