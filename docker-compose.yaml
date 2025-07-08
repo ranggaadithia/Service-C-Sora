@@ -6,15 +6,16 @@ networks:
 services:
   app:
     build:
-      context: .
+      context: .              # karena Dockerfile ada di root
       dockerfile: Dockerfile
     container_name: service_c_project_sora
     ports:
-      - "8002:8002"
+      - "8000:80"             # host:container
     volumes:
-      - .:/app
+      - .:/var/www/html       # agar bisa dev-mode/live reload
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       - DB_HOST=service_c_db
       - DB_PORT=5432
@@ -23,8 +24,6 @@ services:
       - DB_PASSWORD=postgres
     networks:
       - application
-    entrypoint: /bin/sh
-    command: -c "composer install && php artisan key:generate && php artisan migrate && php artisan serve --host=0.0.0.0 --port=8002"
 
   db:
     image: postgres:15

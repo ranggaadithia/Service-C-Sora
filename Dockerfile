@@ -1,7 +1,11 @@
-FROM php:8.3.10
+FROM php:8.3.10-fpm
 
-# Install dependencies
-RUN apt-get update -y && apt-get install -y openssl zip unzip git libpq-dev
+# Install system dependencies
+RUN apt-get update -y && apt-get install -y \
+    curl zip unzip git \
+    libpq-dev \
+    nginx \
+    supervisor
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -10,16 +14,21 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 RUN docker-php-ext-install pdo pdo_pgsql
 
 # Set working directory
-WORKDIR /app
+WORKDIR /var/www/html
 
-# Copy all source code into the container
-COPY . /app
+# Copy Laravel app (semua isi project Laravel kamu)
+COPY . /var/www/html
 
-# Install PHP dependencies
-RUN composer install
+# Copy Nginx config
+COPY nginx/default.conf /etc/nginx/sites-available/default
 
-# Expose the Laravel dev server port
-EXPOSE 8002
+# Copy Supervisor config
+COPY supervisord.conf /etc/supervisord.conf
 
-# Default command to run Laravel
-CMD php artisan serve --host=0.0.0.0 --port=8002
+# Copy startup script
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
+EXPOSE 80
+
+CMD ["/start.sh"]
