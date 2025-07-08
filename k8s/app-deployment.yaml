@@ -17,7 +17,7 @@ spec:
           image: ranggaadithia/service-c-app:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 8002
+            - containerPort: 80   # nginx listen port inside container
           env:
             - name: DB_HOST
               value: service-c-db
@@ -29,14 +29,18 @@ spec:
               value: postgres
             - name: DB_PASSWORD
               value: postgres
-          command: ["/bin/sh", "-c"]
-          args:
-            - |
-              composer install && \
-              php artisan key:generate && \
-              php artisan migrate && \
-              php artisan serve --host=0.0.0.0 --port=8002
-
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
 ---
 apiVersion: v1
 kind: Service
@@ -47,8 +51,7 @@ spec:
     app: service-c-app
   ports:
     - protocol: TCP
-      port: 8002
-      targetPort: 8002
-      nodePort: 30002
+      port: 80
+      targetPort: 80
+      nodePort: 8002  # expose ke host port 8002
   type: NodePort
----
